@@ -1,0 +1,288 @@
+LEXORA Product Behavior Specification
+
+Purpose
+This document defines what Lexora should do from a user behavior and UX scenario perspective.
+It focuses on currently implemented behavior in `help/template` and target behavior for the next phase.
+It does not describe React internal architecture.
+
+____________________________________________________________________
+1) Product Intent
+
+Lexora is a fantasy-themed reading platform where users discover books, organize personal reading spaces, read books, and interact with community content.
+
+The UX goals are:
+- Keep reading motivating and playful.
+- Make progress visible and easy to continue.
+- Keep navigation predictable and fast.
+- Keep community interactions safe and user-owned.
+
+____________________________________________________________________
+2) Baseline: What Is Currently Working In `help/template`
+
+2.1 Global behavior baseline
+- Multi-page static experience with shared visual language.
+- Lamp/Lumo header behavior is interactive.
+- Book cards on catalog and profile views route to book details.
+- Book detail page renders by `id` query parameter.
+- Community list is visible on book detail and sortable (Top/Recent/Trending).
+
+2.2 Page behavior baseline
+
+Home
+- Book catalog search by title/author.
+- Genre filtering tabs.
+- "For You" recommendation section appears in Trending mode.
+- Map modal opens and can trigger genre filter selection.
+
+Profile
+- Shows user summary stats.
+- Shows My Library and My List visual states.
+- Clicking book cards should lead to details page behavior.
+
+Book details
+- Existing redirection into details page is working and must stay unchanged.
+- CTA text adapts (`START READING`, `CONTINUE READING`, `READ AGAIN`) based on mocked state.
+- Community discussion cards are displayed with sort modes.
+
+Admin
+- Sidebar navigation across Dashboard, Users, Books, Community, Lumo, Age Access, Rewards, Settings.
+- Dashboard shows cards/charts.
+- Tables are rendered for Users, Books, Community.
+- Notifications dropdown and section switching are interactive.
+
+Known baseline limitation (important for planning)
+- Reading interface/page-level reading progress persistence is not fully implemented.
+- Book detail action buttons for library/list membership are not fully implemented.
+- Community is currently mostly display-oriented and not a full social feed workflow.
+
+____________________________________________________________________
+3) Functional Behavior Specification (Current vs Target)
+
+3.1 Catalog/List/Library to Book Detail navigation
+
+Current
+- Selecting book cards routes users to book details.
+
+Target (must preserve existing behavior)
+- When user clicks a book in Book Catalog, My Library, or My List, system opens the correct Book Details page for that exact book.
+- Existing routing behavior remains intact with no regression.
+
+Acceptance
+- No broken route from any of the 3 entry points.
+- Correct book ID/context always opens.
+
+____________________________________________________________________
+3.2 Book Details actions: Library and List management
+
+Current
+- Book details presents core content and read CTA.
+- Add/Delete actions for Library/List are not complete.
+
+Target
+- On Book Details page, system exposes behavior-aware actions:
+  - Add to Your Library
+  - Delete from Your Library
+  - Add to Your List
+  - Delete from Your List
+- Actions are linked to current logged-in user state.
+- UI state updates immediately after action.
+- Buttons adapt by state:
+  - If already in Library: hide/disable Add and show Delete.
+  - If already in List: hide/disable Add and show Delete.
+
+Scenario rules
+- Happy path add: user adds book and sees immediate state update.
+- Happy path delete: user removes book and sees immediate state update.
+- Return user path: existing membership status is reflected on initial render.
+- Error-safe path: on action failure, previous state remains visible with clear feedback.
+
+Acceptance
+- Add/Delete actions mutate the correct user collection only.
+- No duplicate entries in list/library.
+- No cross-user contamination of data.
+
+____________________________________________________________________
+3.3 Reading behavior and progress continuity
+
+Current
+- CTA label may show start/continue/read-again based on mocked status.
+- Actual reading interface flow and per-user per-book resume is incomplete.
+
+Target
+- Clicking Start Reading from Book Details opens reading interface for that specific book.
+- Reading interface supports smooth navigation (next/previous or equivalent).
+- System auto-saves last read page.
+- Save is scoped by user + book.
+- On return:
+  - If no prior progress: start at page 1.
+  - If prior progress exists: continue from last saved page.
+- UX label behavior:
+  - New reader: Start Reading.
+  - Returning reader: Continue Reading (or automatic continuation after click).
+
+Scenario rules
+- First-time path: open at page 1.
+- Returning path: resume exactly at saved page.
+- Mid-session path: frequent save checkpoints avoid losing progress.
+- Multi-book path: progress for Book A never overrides Book B.
+
+Acceptance
+- Progress persistence behaves independently for each user/book pair.
+- Resume is accurate after navigation away and return.
+- Existing details page design and navigation style are preserved.
+
+____________________________________________________________________
+3.4 Book Community social feed behavior
+
+Current
+- Posts are displayed and can be sorted; interactive social authoring is incomplete.
+
+Target
+- Users can create and publish text posts.
+- Users can comment on posts.
+- Users can view all comments under each post.
+- Users can like/upvote posts.
+- Optional extension: like/upvote comments.
+- Post cards display:
+  - author
+  - content
+  - publication date/time
+  - likes/upvotes count
+  - comments count
+- Comment items display:
+  - author
+  - content
+  - publication date/time
+  - optional likes/upvotes count
+- Ownership permissions:
+  - Users can edit/delete only their own posts/comments.
+- Empty state:
+  - "No posts yet. Be the first to share something with the community!"
+- Immediate UI refresh after create/comment/like/delete/edit.
+
+Scenario rules
+- New post path: compose and publish from top input area.
+- Engagement path: like and comment updates appear instantly.
+- Ownership path: edit/delete controls visible only on own content.
+- Empty path: clear and friendly call-to-action message.
+
+Acceptance
+- All community actions are correctly bound to current user.
+- Unauthorized edit/delete is not available in UI behavior.
+- Existing community section visuals remain consistent with Lexora style.
+
+____________________________________________________________________
+4) Admin React -> Vanilla JS/HTML/SCSS Transformation Plan
+
+Objective
+Improve Admin conversion accuracy so behavior and UX intent match expected admin workflows.
+
+Definition of done
+- Behavior parity with intended admin interactions.
+- Visual consistency with existing Lexora admin style.
+- No regression in already working admin navigation.
+
+4.1 Parity checklist by section
+
+A) Sidebar and shell navigation
+- Active state always matches visible section.
+- Header title updates correctly per section.
+- Collapsed sidebar behavior keeps controls accessible.
+- Logout behavior remains predictable.
+
+B) Dashboard
+- Stat cards display coherent values and labels.
+- Charts render once per view without duplicated overlays.
+- Alerts panel shows actionable moderation/economy highlights.
+
+C) Users management
+- Search/filter interaction visibly affects rows.
+- Action controls are behaviorally clear (view/edit/delete paths).
+- Role and age-bucket status remain understandable.
+
+D) Books management
+- Search and add-book entry behavior is clear and consistent.
+- Table actions map to intended edit/view/remove flows.
+- Audience/trending badges stay semantically correct.
+
+E) Community moderation
+- Type/severity filtering behavior is reliable.
+- Approve/reject/review actions map to clear status transitions.
+- Pending counts align with displayed records.
+
+F) Lumo moderation
+- Status metrics and monitoring views remain understandable.
+- Chart outputs reflect selected timeframe/data context.
+
+G) Age access controls
+- Toggle behavior is explicit per +18 and -18 policy group.
+- Rule language prevents ambiguous moderation interpretation.
+
+H) Rewards and settings
+- Reward defaults and lamp penalty rules are editable with clear outcomes.
+- Save/reset behavior clearly communicates what changed.
+
+4.2 Transformation workflow
+
+1. Capture intended admin behavior matrix from current admin UX.
+2. Define each admin interaction contract (trigger -> expected UI state -> expected data state).
+3. Implement/adjust vanilla JS handlers to satisfy contracts.
+4. Validate each section against parity checklist.
+5. Run regression check for sidebar navigation and shared admin controls.
+6. Update docs after parity verification.
+
+____________________________________________________________________
+5) UX Copy and Behavior Rules
+
+Consistency rules
+- Keep current visual identity and tone.
+- Keep existing successful navigation unchanged.
+- Avoid sudden context jumps after actions.
+- Prefer immediate local feedback after every user action.
+
+State messaging rules
+- Use clear action labels (Add, Delete, Continue).
+- Use explicit empty states rather than blank containers.
+- Use clear ownership cues in community actions.
+
+____________________________________________________________________
+6) Acceptance Criteria (Release Gate)
+
+Navigation safety gates
+- Catalog -> Details remains working.
+- Library -> Details remains working.
+- List -> Details remains working.
+
+Book detail collection actions
+- Add/Delete library works and reflects current state instantly.
+- Add/Delete list works and reflects current state instantly.
+- Button visibility/disable state matches membership reality.
+
+Reading continuity
+- Start Reading opens reading interface for selected book.
+- Reader can move forward/backward smoothly.
+- Last page is saved automatically.
+- Resume always uses correct user+book context.
+
+Community social behavior
+- Users can create posts and comments.
+- Users can like/upvote posts (and comments if enabled).
+- Users can edit/delete only their own content.
+- Empty state appears when no posts exist.
+
+Admin parity
+- All admin sections are reachable and correctly toggled.
+- Section interactions behave according to parity checklist.
+- No breakage of existing admin shell interactions.
+
+Non-regression
+- Existing working features continue to behave exactly as before unless explicitly upgraded by this plan.
+
+____________________________________________________________________
+7) Documentation Maintenance Rule
+
+For every future UX change:
+- Update this file using "Current vs Target" format.
+- Add scenario rules and acceptance bullets for each changed area.
+- Keep documentation behavior-first, not framework-first.
+

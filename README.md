@@ -1,73 +1,87 @@
-# Welcome to your Lovable project
+# Lexora Documentation Hub
 
-## Project info
+Lexora is a fantasy-themed reading platform focused on discovery, reading continuity, and social reading community behavior.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+This repository currently contains a JS/HTML/SCSS implementation in `help/template` and behavior documentation for what is live now versus what is targeted next.
 
-## How can I edit this code?
+## Documentation Purpose
 
-There are several ways of editing your application.
+This documentation is product-behavior oriented.
+It describes:
+- What users can do now.
+- What users should be able to do next.
+- How UI/UX scenarios should behave across pages.
 
-**Use Lovable**
+It intentionally avoids React project internals and focuses on software behavior.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Current Implementation Snapshot (`help/template`)
 
-Changes made via Lovable will be committed automatically to this repo.
+Implemented baseline:
+- Home catalog search/filter/recommendation and map-driven genre selection.
+- Profile sections for library/list visual tracking.
+- Book details rendering with dynamic CTA labels and community sort tabs.
+- Shared Lumo/Lamp gamification behavior.
+- Admin portal shell with section navigation, tables, charts, and moderation-oriented views.
 
-**Use your preferred IDE**
+Known gaps to complete:
+- Full reading interface behavior with per-user per-book progress resume.
+- Full Add/Delete logic from Book Details for Library and List.
+- Full social feed behavior (create/edit/delete/comment/like ownership workflows).
+- Admin conversion parity hardening (React intent to vanilla behavior accuracy).
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Primary Behavior Spec
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Main product behavior specification:
+  - `plan.txt`
 
-Follow these steps:
+Inside `plan.txt` you will find:
+- Current vs Target behavior by feature.
+- UI/UX scenario rules (happy path, return-user path, empty-state path, error-safe path).
+- Dedicated Admin React -> vanilla transformation plan and parity checklist.
+- Acceptance criteria and non-regression gates.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Priority Feature Areas
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. Book navigation continuity
+   - Catalog, Library, and List must keep opening the correct Book Details page.
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Book Details actions
+   - Add/Delete to Library and List with intelligent button state handling.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+3. Reading continuity
+   - Start at page 1 for new readers.
+   - Continue from last saved page for returning readers.
+   - Progress must be scoped per user and per book.
 
-**Edit a file directly in GitHub**
+4. Community social behavior
+   - Post creation, commenting, likes, ownership-based edit/delete controls, and empty-state UX.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+5. Admin parity
+   - Keep all current admin interactions stable while improving conversion accuracy.
 
-**Use GitHub Codespaces**
+## Working Rule For Future Updates
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Whenever behavior changes:
+- Update `plan.txt` first.
+- Keep descriptions user-facing and scenario-based.
+- Add acceptance criteria for any new or modified interaction.
 
-## What technologies are used for this project?
+## Admin Compatibility Addendum
 
-This project is built with:
+React-to-template parity updates have been applied to the admin experience in `help/template`.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Current compatibility status:
+- Pass: sidebar collapse/expand, section switching, header title sync, notifications behavior.
+- Pass: dashboard parity improved to include full KPI surface, insights cards, and complete quick-alert coverage.
+- Pass: Users filters and actions (search, role filter, edit modal, delete, table rerender).
+- Pass: Books filters and actions (search, genre/audience filters, add/edit modal, delete, table rerender).
+- Pass: Community section now follows post-moderation semantics (search, tag/status filtering, status actions).
+- Pass: Lumo section now has actionable moderation flow (type/severity filters, approve/reject actions, pending count, active toggle).
+- Pass: Age Access and Rewards styling contract restored in compiled CSS; controls and layouts render correctly.
+- Pass: Age Access, Rewards, and Site Settings controls are state-driven and update immediately.
+- Pass: Chart lifecycle hardened (chart instances are destroyed before re-initialization to avoid duplicates).
 
-## How can I deploy this project?
+Known intentional scope limits:
+- State is in-memory only (reload resets), matching mock behavior expectations.
+- Some `View` actions remain visual/no-op parity placeholders.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
